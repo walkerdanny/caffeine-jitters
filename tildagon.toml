@@ -37,4 +37,4 @@ description = "Companion app for the Club Mate haptics hexpansion. Up and down b
 # increased, we interpret this as a new version being released.
 #
 # Version number must be an string!
-version = "0.0.1"
+version = "0.0.2"
