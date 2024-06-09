@@ -99,10 +99,38 @@ class CaffeineJitter(app.App):
     def draw(self, ctx):
         if self.hexpansion_config is None:
             clear_background(ctx)
-            ctx.font_size = 24
+            ctx.font_size = 18
 
-            wi = ctx.text_width("No hexpansion detected")
-            ctx.rgb(1.0,1.0,1.0).move_to(-wi/2,0).text("No hexpansion detected")
+            text_line = "No hexpansion found."
+            wi = ctx.text_width(text_line)
+            ctx.rgb(1.0,1.0,1.0).move_to(-wi/2,-ctx.font_size*2).text(text_line)
+
+            text_line = "Ensure the EEPROM has"
+            wi = ctx.text_width(text_line)
+            ctx.rgb(1.0,1.0,1.0).move_to(-wi/2,-ctx.font_size).text(text_line)
+
+            text_line = "been provisioned."
+            wi = ctx.text_width(text_line)
+            ctx.rgb(1.0,1.0,1.0).move_to(-wi/2,0).text(text_line)
+
+            text_line = "Instructions are on"
+            wi = ctx.text_width(text_line)
+            ctx.rgb(1.0,1.0,1.0).move_to(-wi/2,ctx.font_size).text(text_line)
+
+            text_line = "the Github repo."
+            wi = ctx.text_width(text_line)
+            ctx.rgb(1.0,1.0,1.0).move_to(-wi/2,ctx.font_size*2).text(text_line)
+
+            offset = ctx.font_size *2
+            ctx.font_size = 15
+            text_line = "github.com/walkerdanny"
+            wi = ctx.text_width(text_line)
+            ctx.rgb(1.0,0.3,0.3).move_to(-wi/2,offset+ctx.font_size).text(text_line)
+
+            text_line = "/caffeine-jitters"
+            wi = ctx.text_width(text_line)
+            ctx.rgb(1.0,0.3,0.3).move_to(-wi/2,offset+ctx.font_size*2).text(text_line)
+
         else:
             clear_background(ctx)
             ctx.font_size = 24
