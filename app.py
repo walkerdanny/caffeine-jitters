@@ -1,16 +1,14 @@
 import app
 import time
-import asyncio
 from .adafruit_drv2605 import *
-from machine import Pin, I2C
-from events.input import Buttons, BUTTON_TYPES, ButtonDownEvent, ButtonUpEvent
+from machine import I2C
+from events.input import Buttons, BUTTON_TYPES, ButtonDownEvent
 from system.eventbus import eventbus
-from system.hexpansion.util import read_hexpansion_header, get_hexpansion_block_devices, detect_eeprom_addr
+from system.hexpansion.util import read_hexpansion_header, detect_eeprom_addr
 from system.hexpansion.events import HexpansionRemovalEvent, HexpansionInsertionEvent
 from system.hexpansion.config import *
 from app_components import clear_background
 from random import randint
-import tildagonos
 
 
 class CaffeineJitter(app.App):
@@ -22,8 +20,8 @@ class CaffeineJitter(app.App):
         self.jitter_timeout_ms = self.generate_timeout() # How long between jitters
         self.last_jitter_time = time.ticks_ms() # Last time we did a jitter in ms
         self.cool_drv2605_effects = [92, 47, 58, 85, 82] # Add whatever you want here, get weird with it. Don't play the continious ones though. This is literally just a list of effect numbers I thought were fun and aggressive enough to be felt.
-
         self.hexpansion_config = self.scan_for_hexpansion()
+
         if self.hexpansion_config is not None:
             self.drv = DRV2605(self.hexpansion_config.i2c)
             self.enable_pin = self.hexpansion_config.pin[3] # This is the enable pin! Drive it high to enable the driver IC! Don't be like me and forget to do this!
@@ -32,17 +30,26 @@ class CaffeineJitter(app.App):
         else:
             self.drv = None
             self.enable_pin = None
+
         eventbus.on(ButtonDownEvent, self._handle_buttondown, self)
-        eventbus.on_async(HexpansionInsertionEvent, self.handle_hexpansion_insertion, self)
-        eventbus.on_async(HexpansionRemovalEvent, self.handle_hexpansion_removal, self)
+        eventbus.on(HexpansionInsertionEvent, self.handle_hexpansion_insertion, self)
+        eventbus.on(HexpansionRemovalEvent, self.handle_hexpansion_removal, self)
 
 
-    def handle_hexpansion_insertion(self):
+    def handle_hexpansion_insertion(self, event):
         self.hexpansion_config = self.scan_for_hexpansion()
+        self.last_jitter_time = time.ticks_ms()
+        if self.hexpansion_config is not None:
+            self.drv = DRV2605(self.hexpansion_config.i2c)
+            self.enable_pin = self.hexpansion_config.pin[3] # This is the enable pin! Drive it high to enable the driver IC! Don't be like me and forget to do this!
+            self.enable_pin.init(self.enable_pin.OUT)
+            self.enable_pin.on()
+        else:
+            self.drv = None
+            self.enable_pin = None
 
-    def handle_hexpansion_removal(self):
+    def handle_hexpansion_removal(self, event):
         self.hexpansion_config = self.scan_for_hexpansion()
-
 
     def scan_for_hexpansion(self): # Is there a proper way of doing this so I don't have to implement it myself?
         for port in range(1, 7):
@@ -65,21 +72,21 @@ class CaffeineJitter(app.App):
                 # We found it, the search is over!
                 print("Found the desired hexpansion in port " + str(port))
                 return HexpansionConfig(port)
-        
+
         return None
 
     def _handle_buttondown(self, event: ButtonDownEvent):
         if BUTTON_TYPES["CANCEL"] in event.button:
             self._cleanup()
             self.minimise()
-        
+
         if BUTTON_TYPES["UP"] in event.button:
             self._cleanup()
-            self.jitter_factor += 0.1   
+            self.jitter_factor += 0.1
             if self.jitter_factor >= 1:
                 self.jitter_factor = 1.0
             self.jitter_timeout_ms = self.generate_timeout() # Update the timeout whenever the amount consumed has changed
-        
+
         if BUTTON_TYPES["DOWN"] in event.button:
             self._cleanup()
             self.jitter_factor -= 0.1
@@ -87,14 +94,15 @@ class CaffeineJitter(app.App):
                 self.jitter_factor = 0.0
             self.jitter_timeout_ms = self.generate_timeout() # Update the timeout whenever the amount consumed has changed
 
-
-
     def _cleanup(self):
         eventbus.remove(ButtonDownEvent, self._handle_buttondown, self.app)
 
     def update(self, delta):
         if self.hexpansion_config is not None:
-            self.jitter_randomly()
+            try:
+                self.jitter_randomly()
+            except:
+                print("hexpansion removed while jittering")
 
     def draw(self, ctx):
         if self.hexpansion_config is None:
@@ -152,7 +160,7 @@ class CaffeineJitter(app.App):
     def jitter_randomly(self):
         if self.jitter_factor >= 0.1:
             print("Next jitter in: " + str( -(time.ticks_ms()-self.last_jitter_time - self.jitter_timeout_ms)) + "ms")
-            if (time.ticks_ms() - self.last_jitter_time) > self.jitter_timeout_ms:            
+            if (time.ticks_ms() - self.last_jitter_time) > self.jitter_timeout_ms:
                 self.do_one_jitter()
                 self.last_jitter_time = time.ticks_ms()
                 self.jitter_timeout_ms = self.generate_timeout()
@@ -172,4 +180,3 @@ class CaffeineJitter(app.App):
 
 
 __app_export__ = CaffeineJitter
-
