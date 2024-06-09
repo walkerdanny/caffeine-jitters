@@ -164,8 +164,6 @@ class CaffeineJitter(app.App):
                 self.do_one_jitter()
                 self.last_jitter_time = time.ticks_ms()
                 self.jitter_timeout_ms = self.generate_timeout()
-                    # Gives a range of 1-6 seconds when jf is 1
-                    # Give a range  of 10-60 seconds when jf is 0.1
 
 
     def generate_timeout(self):
