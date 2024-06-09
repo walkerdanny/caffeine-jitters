@@ -28,8 +28,14 @@ header = HexpansionHeader(
     friendly_name="Caffeine!",
 )
 ```
-
 Then you should be all good to go!
+
+### Note some more:
+
+You might get an error when provisioning the EEPROM that says `Failed to decode header: Invalid magic in hexpansion header:`
+
+This is an issue with something somewhere but maybe not my fault? There's a simple workaround for it in [this issue](https://github.com/emfcamp/badge-2024-software/issues/59) which should get you going.
+
 
 ## Building on this
 
