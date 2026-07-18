@@ -69,7 +69,7 @@ class CaffeineJitter(app.App):
             else:
                 print("Read header: " + str(header))
 
-            if (header.vid is 0xCAFE) and (header.pid is 0xCAFF):
+            if (header.vid is 0x70AD) and (header.pid is 0xCAFF):
                 # We found it, the search is over!
                 print("Found the desired hexpansion in port " + str(port))
                 return HexpansionConfig(port)
