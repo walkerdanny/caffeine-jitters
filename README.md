@@ -5,11 +5,12 @@
 
 If you got an assembled version of the Club Mate Hexpansion from me at EMF Camp 2024, this is an app that makes it actually do something!
 
+## You don't need to install this app to make the hexpansion do things as of 2026. The newest firmware, installable on the "Hexpansions" app on the badge, will respond to events that the badge emits. This app was just a proof of concept when the functionality was more limited.
+
 It's based mostly on the [Adafruit DRV2605 CircuitPython Library](https://github.com/adafruit/Adafruit_CircuitPython_DRV2605) and I take absolutely no credit for any of their great work.
 
 Because it's based on the Adafruit library, the [Adafruit Docs](https://docs.circuitpython.org/projects/drv2605/en/latest/) can be used to build your own apps rather than me having to actually do docs! Yay!
 
-As is often the way with these things, it's not 100% reliable - the badge doesn't always detect the Hexpansion properly etc. This will improve as the badge firmware improves.
 
 ## Note:
 
@@ -22,7 +23,7 @@ header = HexpansionHeader(
     fs_offset=32,
     eeprom_page_size=32,
     eeprom_total_size=256*32,
-    vid=0xCAFE,
+    vid=0x70AD,
     pid=0xCAFF,
     unique_id=0x0,
     friendly_name="Caffeine!",
@@ -30,11 +31,6 @@ header = HexpansionHeader(
 ```
 Then you should be all good to go!
 
-### Note some more:
-
-You might get an error when provisioning the EEPROM that says `Failed to decode header: Invalid magic in hexpansion header:`
-
-This is an issue with something somewhere but maybe not my fault? There's a simple workaround for it in [this issue](https://github.com/emfcamp/badge-2024-software/issues/59) which should get you going.
 
 
 ## Building on this

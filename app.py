@@ -41,6 +41,7 @@ class CaffeineJitter(app.App):
         self.last_jitter_time = time.ticks_ms()
         if self.hexpansion_config is not None:
             self.drv = DRV2605(self.hexpansion_config.i2c)
+            self.drv.library  = LIBRARY_TS2200B
             self.enable_pin = self.hexpansion_config.pin[3] # This is the enable pin! Drive it high to enable the driver IC! Don't be like me and forget to do this!
             self.enable_pin.init(self.enable_pin.OUT)
             self.enable_pin.on()
@@ -69,7 +70,7 @@ class CaffeineJitter(app.App):
             else:
                 print("Read header: " + str(header))
 
-            if (header.vid is 0xCAFE) and (header.pid is 0xCAFF):
+            if ((header.vid is 0xCAFE) and (header.pid is 0xCAFF)) or ((header.vid is 0x70AD) and (header.pid is 0xCAFF)):
                 # We found it, the search is over!
                 print("Found the desired hexpansion in port " + str(port))
                 return HexpansionConfig(port)
