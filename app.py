@@ -24,6 +24,7 @@ class CaffeineJitter(app.App):
 
         if self.hexpansion_config is not None:
             self.drv = DRV2605(self.hexpansion_config.i2c)
+            self.drv.library  = LIBRARY_TS2200B
             self.enable_pin = self.hexpansion_config.pin[3] # This is the enable pin! Drive it high to enable the driver IC! Don't be like me and forget to do this!
             self.enable_pin.init(self.enable_pin.OUT)
             self.enable_pin.on()
